@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Event Manager</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: white;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .app {
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    h1 {
+      margin-top: 0;
+      text-align: center;
+    }
+
+    form {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    input {
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px;
+      border: 0;
+      border-radius: 5px;
+      background: #eee;
+      color: black;
+      cursor: pointer;
+    }
+
+    .event {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #ddd;
+      padding: 12px 0;
+    }
+
+    .event button {
+      background: #eee;
+      color: black;
+    }
+
+    .empty {
+      text-align: center;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>Event Manager</h1>
+
+    <form id="eventForm">
+      <input id="eventName" type="text" placeholder="Event name" required>
+      <input id="eventDate" type="date" required>
+      <button type="submit">Add Event</button>
+    </form>
+
+    <div id="eventList"></div>
+  </div>
+
+  <script>
+    var eventForm = document.getElementById("eventForm");
+    var eventName = document.getElementById("eventName");
+    var eventDate = document.getElementById("eventDate");
+    var eventList = document.getElementById("eventList");
+
+    var events = JSON.parse(localStorage.getItem("events")) || [];
+
+    function saveEvents() {
+      localStorage.setItem("events", JSON.stringify(events));
+    }
+
+    function showEvents() {
+      eventList.innerHTML = "";
+
+      if (events.length === 0) {
+        eventList.innerHTML = '<p class="empty">No events added yet.</p>';
+        return;
+      }
+
+      events.forEach(function (event, index) {
+        var div = document.createElement("div");
+        div.className = "event";
+
+        var text = document.createElement("span");
+        text.textContent = event.name + " - " + event.date;
+
+        var deleteButton = document.createElement("button");
+        deleteButton.textContent = "Delete";
+        deleteButton.onclick = function () {
+          events.splice(index, 1);
+          saveEvents();
+          showEvents();
+        };
+
+        div.appendChild(text);
+        div.appendChild(deleteButton);
+        eventList.appendChild(div);
+      });
+    }
+
+    eventForm.onsubmit = function (event) {
+      event.preventDefault();
+
+      events.push({
+        name: eventName.value,
+        date: eventDate.value
+      });
+
+      saveEvents();
+      showEvents();
+      eventForm.reset();
+    };
+
+    showEvents();
+  </script>
+</body>
+</html>
